@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\EmailVerificationPromptController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,7 +29,8 @@ Route::get('/verify', function () {
 })->middleware('guest')->name('verify');
 
 Route::post('/verifydna', [AuthenticatedSessionController::class, 'verifyTypingDNA'])->middleware('guest')->name('verifydna');
+Route::get('/send-email', [EmailVerificationPromptController::class, 'sendCode'])->middleware(['guest']);
 
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

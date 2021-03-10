@@ -1,15 +1,15 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 
 class TypingDNA
 {
     private static $instance = null;
     private $apiKey = null;
-    private $apiSecret =null;
+    private $apiSecret = null;
     private $typingdna_url = null;
     private $secret = null;
 
@@ -17,7 +17,7 @@ class TypingDNA
     private function __construct()
     {
         $this->apiKey = env('TYPINGDNA_API_KEY');
-        $this->apiSecret =env('TYPINGDNA_API_SECRET');
+        $this->apiSecret = env('TYPINGDNA_API_SECRET');
         $this->typingdna_url = env('TYPINGDNA_BASE_URL');
         $this->secret = env('TYPINGDNA_SECRET');
     }
@@ -29,30 +29,24 @@ class TypingDNA
         }
         return self::$instance;
     }
-    
+
     public function checkUser(User $user)
     {
-        // $secret = env('TYPINGDNA_SECRET');
         $userId = $this->generateUserID($user->id, $this->secret);
-        $result = $checkedUser = $this->check($userId);
+        $result = $this->check($userId);
         return  $result;
     }
 
     public function doAuto(User $user, $tp)
     {
-        // $apiKey = env('TYPINGDNA_API_KEY');
-        // $apiSecret =env('TYPINGDNA_API_SECRET');
-        // $typingdna_url = env('TYPINGDNA_BASE_URL');
-
-        // $secret = env('TYPINGDNA_SECRET');
         $userId = $this->generateUserID($user->id, $this->secret);
 
 
-        $typingdna_url_de = urldecode($this->typingdna_url.'/auto/'.$userId);
+        $typingdna_url_de = urldecode($this->typingdna_url . '/auto/' . $userId);
         $response = Http::withToken(base64_encode("$this->apiKey:$this->apiSecret"), 'Basic')->post($typingdna_url_de, [
-          'tp' => $tp
+            'tp' => $tp
         ]);
-        
+
         $result = $response->json();
         if ($result['status'] === 429) {
             sleep(1);
@@ -63,11 +57,8 @@ class TypingDNA
 
     private function check($userid)
     {
-        // $apiKey = env('TYPINGDNA_API_KEY');
-        // $apiSecret =env('TYPINGDNA_API_SECRET');
-        // $typingdna_url = env('TYPINGDNA_BASE_URL');
 
-        $typingdna_url = urldecode($this->typingdna_url.'/user/'.$userid);
+        $typingdna_url = urldecode($this->typingdna_url . '/user/' . $userid);
 
         $response = Http::withToken(base64_encode("$this->apiKey:$this->apiSecret"), 'Basic')->get($typingdna_url);
         return $response->json();
@@ -75,6 +66,6 @@ class TypingDNA
 
     private function generateUserID($userid, $privateKey)
     {
-        return Hash::make($userid . $privateKey);
+        return \md5($userid . $privateKey);
     }
 }

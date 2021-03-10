@@ -21,15 +21,14 @@
             <div>
                 <x-label for="email" :value="__('Email')" />
 
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" required autofocus />
+                <x-input id="email" class="block mt-1 w-full disable-autocomplete" type="email" name="email" required autofocus />
             </div>
 
             <!-- Password -->
             <div class="mt-4">
                 <x-label for="password" :value="__('Password')" />
 
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required
-                    autocomplete="current-password" />
+                <x-input id="password" class="block mt-1 w-full disable-autocomplete" type="password" name="password" required autocomplete="current-password" />
             </div>
 
             <!-- Remember Me -->
@@ -56,6 +55,9 @@
     </x-auth-card>
     <x-slot name="script_h">
         <script src="https://typingdna.com/scripts/typingdna.js"></script>
+        <script src="{{ asset('js/autocomplete-disabler.js') }}"></script>
+        <script src="{{ asset('js/typing-visualizer.js') }}"> </script>
+
     </x-slot>
 
     <x-slot name="script">
@@ -63,6 +65,12 @@
             const tdna = new TypingDNA();
             tdna.addTarget('email');
             tdna.addTarget('password');
+            var disabler = new AutocompleteDisabler({
+                showTypingVisualizer: true,
+                showTDNALogo: true
+            });
+            disabler.disableCopyPaste();
+            disabler.disableAutocomplete();
             document.getElementById('email').focus();
 
             function validate(form) {

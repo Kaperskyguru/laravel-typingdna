@@ -63,26 +63,27 @@ class AuthenticatedSessionController extends Controller
 
     public function verifyTypingDNA(LoginRequest $request)
     {
-        // dd($request);
 
         $user = User::where('email', $request->email)->first();
-
         $check = TypingDNA::getInstance()->checkUser($user);
 
-        if ($check['success'] === 1 && $check['count'] >= 0) {
+        if ($check['success'] === 1 && ($check['count'] >= 0 || $check['mobilecount'] >= 0)) {
             $result = TypingDNA::getInstance()->doAuto($user, session()->get('typingPattern'));
             if ($result['status'] > 200) {
                 return $this->destroy($request);
             }
-            
-            $request->authenticate();
-            $request->session()->regenerate();
-            session()->forget('typingPattern');
-            session()->forget('textid');
-            session()->forget('email');
-            session()->forget('password');
-
-            return redirect(RouteServiceProvider::HOME);
+            if ((isset($result['high_confidence']) && isset($result['result'])) && ($result['high_confidence'] === 1 && $result['result'] === 1)) {
+                session()->forget('typingPattern');
+                session()->forget('textid');
+                session()->forget('email');
+                session()->forget('password');
+                session()->forget('error_message');
+                $request->authenticate();
+                $request->session()->regenerate();
+                return redirect(RouteServiceProvider::HOME);
+            }
+            session()->flash('error_message', $result['message']);
+            return redirect()->route('verify');
         } else {
             return $this->destroy($request);
         }

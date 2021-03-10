@@ -6,30 +6,6 @@
         </a>
     </x-slot>
 
-    <!-- Session Status -->
-    <!-- <x-auth-session-status class="mb-4" :status="session('status')" /> -->
-
-    <!-- Validation Errors -->
-    <!-- <x-auth-validation-errors class="mb-4" :errors="$errors" /> -->
-
-
-
-    <!-- <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8" style="color:red">
-            Verifying your data with TypingDNA
-        </div>
-    </div>
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-md sm:rounded-lg">
-                <div class="p-6 bg-white border-b border-gray-200">
-                    
-                </div>
-            </div>
-        </div>
-    </div> -->
-
     <section id="loading">
         <div class="content">
             Verifying your data with TypingDNA
@@ -40,17 +16,19 @@
             <form method="POST" action="/verifydna" name="form">
                 @csrf
 
-                <x-input type="hidden" class="block mt-1 w-full" name="typingPattern"
-                    value="{{ session('typingPattern') }}" />
+                <x-input type="hidden" class="block mt-1 w-full" name="typingPattern" value="{{ session('typingPattern') }}" />
 
                 <x-input type="hidden" class="block mt-1 w-full" name="textid" value="{{ session('textid') }}" />
 
                 <x-input type="hidden" class="block mt-1 w-full" name="email" value="{{ session('email') }}" />
                 <x-input type="hidden" class="block mt-1 w-full" name="password" value="{{ session('password') }}" />
 
-                <x-button href="/" class="ml-3" id="sms">
-                    {{ __('Send SMS') }}
-                </x-button>
+                @if(Session::has('error_message'))
+                <div class="error">{{ Session::get('error_message') }} Try using Email alternative</div>
+                <x-link href="/send-email" class="ml-3" id="email">
+                    {{ __('Send Email') }}
+                </x-link>
+                @endif
 
             </form>
             You will be redirected to the dashboard, if not click <a href="/dashboard">here</a>
@@ -61,6 +39,16 @@
 
     <x-slot name="script">
         <script>
+            const isError = "{{ Session::has('error_message') }}"
+
+            if (!isError) {
+                window.onload = function() {
+                    window.setTimeout(function() {
+                        document.form.submit();
+                    }, 2000);
+                };
+            }
+
             showLoading()
 
             function showLoading() {
@@ -72,12 +60,6 @@
                 document.querySelector('#loading').classList.remove('loading');
                 document.querySelector('#loading-content').classList.remove('loading-content');
             }
-
-            window.onload = function() {
-                window.setTimeout(function() {
-                    document.form.submit();
-                }, 5000);
-            };
         </script>
     </x-slot>
 
@@ -114,6 +96,11 @@
                 top: 40%;
                 left: 50%;
                 transform: translate(-50%, -50%);
+            }
+
+            .error {
+                color: red;
+                font-size: 16px;
             }
 
             .content-footer {
