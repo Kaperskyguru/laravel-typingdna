@@ -12,7 +12,7 @@
         <!-- Validation Errors -->
         <x-auth-validation-errors class="mb-4" :errors="$errors" />
 
-        <form method="POST" action="{{ route('login') }}" name="form" onsubmit="return validate(this)">
+        <form method="POST" action="{{ route('login') }}" name="form">
             @csrf
 
             <x-input name="textid" type="hidden" />
@@ -53,38 +53,4 @@
         </form>
 
     </x-auth-card>
-    <x-slot name="script_h">
-        <script src="https://typingdna.com/scripts/typingdna.js"></script>
-        <script src="{{ asset('js/autocomplete-disabler.js') }}"></script>
-        <script src="{{ asset('js/typing-visualizer.js') }}"> </script>
-
-    </x-slot>
-
-    <x-slot name="script">
-        <script>
-            const tdna = new TypingDNA();
-            tdna.addTarget('email');
-            tdna.addTarget('password');
-            var disabler = new AutocompleteDisabler({
-                showTypingVisualizer: true,
-                showTDNALogo: true
-            });
-            disabler.disableCopyPaste();
-            disabler.disableAutocomplete();
-            document.getElementById('email').focus();
-
-            function validate(form) {
-                const user = form.email.value.toString().trim();
-                const pass = form.password.value.toString().trim();
-                const currentQuote = user + pass;
-                form.textid.value = TypingDNA.getTextId(currentQuote);
-                form.typingPattern.value = tdna.getTypingPattern({
-                    type: 1,
-                    text: currentQuote
-                });
-                return true;
-                // return false
-            }
-        </script>
-    </x-slot>
 </x-guest-layout>

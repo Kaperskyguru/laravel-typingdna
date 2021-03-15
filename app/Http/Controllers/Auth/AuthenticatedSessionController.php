@@ -37,7 +37,8 @@ class AuthenticatedSessionController extends Controller
             session()->put('textid', $request->textid);
             session()->put('email', $request->email);
             session()->put('password', $request->password);
-
+            $request->authenticate();
+            $request->session()->regenerate();
             return redirect()->route('verify');
         } else {
             // Send back errors
@@ -66,9 +67,9 @@ class AuthenticatedSessionController extends Controller
 
         $user = User::where('email', $request->email)->first();
         $check = TypingDNA::getInstance()->checkUser($user);
+        if ($check['success'] === 1 && $check['count'] >= 0) {
+            $result = TypingDNA::getInstance()->doAuto($user, $request->typingPattern);
 
-        if ($check['success'] === 1 && ($check['count'] >= 0 || $check['mobilecount'] >= 0)) {
-            $result = TypingDNA::getInstance()->doAuto($user, session()->get('typingPattern'));
             if ($result['status'] > 200) {
                 return $this->destroy($request);
             }
@@ -82,8 +83,9 @@ class AuthenticatedSessionController extends Controller
                 $request->session()->regenerate();
                 return redirect(RouteServiceProvider::HOME);
             }
-            session()->flash('error_message', $result['message']);
-            return redirect()->route('verify');
+            session()->put('error_message', $result['message']);
+            session()->put('error_count', $check['count']);
+            return redirect()->route('new-verify');
         } else {
             return $this->destroy($request);
         }
