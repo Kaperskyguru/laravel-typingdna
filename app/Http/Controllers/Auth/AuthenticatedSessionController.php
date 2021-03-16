@@ -39,6 +39,8 @@ class AuthenticatedSessionController extends Controller
             session()->put('password', $request->password);
             $request->authenticate();
             $request->session()->regenerate();
+
+            Auth::logout();
             return redirect()->route('verify');
         } else {
             // Send back errors
@@ -69,7 +71,7 @@ class AuthenticatedSessionController extends Controller
         $check = TypingDNA::getInstance()->checkUser($user);
         if ($check['success'] === 1 && $check['count'] >= 0) {
             $result = TypingDNA::getInstance()->doAuto($user, $request->typingPattern);
-
+            dd($result);
             if ($result['status'] > 200) {
                 return $this->destroy($request);
             }
@@ -85,7 +87,7 @@ class AuthenticatedSessionController extends Controller
             }
             session()->put('error_message', $result['message']);
             session()->put('error_count', $check['count']);
-            return redirect()->route('new-verify');
+            return redirect()->route('verify');
         } else {
             return $this->destroy($request);
         }

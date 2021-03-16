@@ -24,16 +24,16 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
-// Route::get('/verify', function () {
-//     return view('auth.verify');
-// })->middleware('guest')->name('verify');
+Route::get('/verify', function () {
+    return view('auth.verify');
+})->middleware('guest')->name('verify');
 
 Route::post('/verifydna', [AuthenticatedSessionController::class, 'verifyTypingDNA'])->middleware('guest')->name('verifydna');
 Route::get('/send-email', [EmailVerificationPromptController::class, 'sendCode'])->middleware(['guest']);
 
-Route::get('/verify', function () {
-    return view('auth.new-verify');
-})->middleware('guest')->name('new-verify');
+// Route::get('/verify', function () {
+//     return view('auth.new-verify');
+// })->middleware('guest')->name('new-verify');
 
 
 require __DIR__ . '/auth.php';
