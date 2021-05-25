@@ -71,7 +71,6 @@ class AuthenticatedSessionController extends Controller
         $check = TypingDNA::getInstance()->checkUser($user);
         if ($check['success'] === 1 && $check['count'] >= 0) {
             $result = TypingDNA::getInstance()->doAuto($user, $request->typingPattern);
-            dd($result);
             if ($result['status'] > 200) {
                 return $this->destroy($request);
             }
